@@ -3,3 +3,6 @@ node_modules/
 
 # personal notes
 notes/
+
+#config files
+nodemon.json
