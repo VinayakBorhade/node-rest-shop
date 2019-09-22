@@ -5,4 +5,4 @@ node_modules/
 notes/
 
 #config files
-nodemon.json
+/nodemon.json
