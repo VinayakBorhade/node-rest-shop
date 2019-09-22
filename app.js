@@ -10,6 +10,25 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+// handling CORS(Cross Origin Request Server) errors, so api can allow requests from any client
+app.use(function(req, res, next){
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+
+    // every browser first sends options request before any post req for checking if req is possible
+    if(req.method==='OPTIONS'){
+        // telling the browser all possible requests that it may send 
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+
+        //using return discontinues the requests to go to other routes written below
+        return res.status(200).json({});
+    }
+    next();
+});
+
 // adding middleware for this rest api
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
