@@ -10,7 +10,21 @@ router.get('/', function(req, res, next){
     .exec()
     .then(function(docs){
         console.log(docs);
-        res.status(200).json(docs);
+        const response={
+            count: docs.length,
+            products: docs.map(function(doc){
+                return {
+                    name: doc.name,
+                    price: doc.price,
+                    _id: doc._id,
+                    request: {
+                        type: 'GET',
+                        url: process.env.DOMAIN_NAME+ 'products/'+doc._id
+                    }
+                }
+            })
+        };
+        res.status(200).json(response);
     })
     .catch(function(err){
         console.log(err);
@@ -31,8 +45,16 @@ router.post('/', function(req, res, next){
         .then(function(result){
             console.log(result);
             res.status(201).json({
-                message: 'handling post requests to /products',
-                createdProduct: result
+                message: 'product created',
+                createdProduct: {
+                    name: result.name,
+                    price: result.price,
+                    _id: result._id,
+                    request: {
+                        type: 'GET',
+                        url: process.env.DOMAIN_NAME+ 'products/'+result._id
+                    }
+                }
             });
         })
         .catch(function(err){
@@ -47,11 +69,18 @@ router.post('/', function(req, res, next){
 router.get('/:productId', function(req, res, next){
     const id=req.params.productId;
     Product.findById(id)
+    .select('name price _id')
     .exec()
     .then(function(doc){
         console.log("from database: "+doc);
         if(doc){
-            res.status(200).json(doc);
+            res.status(200).json({
+                product: doc,
+                request: {
+                    type: 'GET',
+                    url: process.env.DOMAIN_NAME+ 'products/'
+                }
+            });
         }
         else{
             res.status(404).json({message: "Invalid id"});
@@ -72,8 +101,13 @@ router.patch('/:productId', function(req, res, next){
     Product.update({_id: id}, {$set: updateOps })
     .exec()
     .then(function(result){
-        console.log(result);
-        res.status(200).json(result);
+        res.status(200).json({
+            message: 'Product updated',
+            request: {
+                type: 'GET',
+                url: process.env.DOMAIN_NAME+ 'products/'+id
+            }
+        });
     })
     .catch(function(err){
         console.log(err);
@@ -87,7 +121,14 @@ router.delete('/:productId', function(req, res, next){
     .remove({_id: id})
     .exec()
     .then(function(result){
-        res.status(200).json(result);
+        res.status(200).json({
+            message: 'Product deleted',
+            request: {
+                type: 'POST',
+                url: process.env.DOMAIN_NAME + 'products/',
+                data: { name: 'String', price: 'Number' }
+            }
+        });
     }).catch(function(err){
         console.log(err);
         res.status(500).json({error: err});
