@@ -6,3 +6,6 @@ notes/
 
 #config files
 /nodemon.json
+
+# file uploads directories
+uploads/
