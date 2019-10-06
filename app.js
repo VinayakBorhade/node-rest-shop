@@ -6,6 +6,7 @@ const mongoose=require('mongoose');
 
 const productRoutes=require('./api/routes/products');
 const orderRoutes=require('./api/routes/orders');
+const userRoutes=require('./api/routes/users');
 
 mongoose.connect(
     'mongodb+srv://node-shop:'+
@@ -40,6 +41,7 @@ app.use(function(req, res, next){
 // adding middleware for this rest api
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
 
 app.use(function(req, res, next){
     const error=new Error('not found');
